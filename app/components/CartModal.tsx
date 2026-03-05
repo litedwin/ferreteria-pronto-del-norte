@@ -101,12 +101,12 @@ export default function CartModal({ isOpen, onClose }: Props) {
 
       const mapsLink = `https://www.google.com/maps?q=${userLocation.lat},${userLocation.lng}`;
 
-      let message = `🧱 *Pedido Ferretería Prontos del Norte*\n\n`;
+      let message = `🧱 Pedido Ferretería Prontos del Norte\n\n`;
 
       message += `👤 Nombre: ${name}\n`;
       message += `📍 Dirección: ${address}\n`;
       message += `🏠 Referencias: ${reference}\n\n`;
-      message += `🗺️ Ubicación:\n${mapsLink}\n\n`;
+      message += `📍 Ubicación:\n${mapsLink}\n\n`;
 
       message += `📦 Productos:\n`;
 
@@ -116,8 +116,8 @@ export default function CartModal({ isOpen, onClose }: Props) {
       });
 
       message += `\nSubtotal: $${subtotal}`;
-      message += `\n🚚 Envío: $${shipping}`;
-      message += `\n💰 Total: $${total}`;
+      message += `\nEnvío: $${shipping}`;
+      message += `\nTotal: $${total}`;
 
       await addDoc(collection(db, "orders"), {
         name,
@@ -136,7 +136,7 @@ export default function CartModal({ isOpen, onClose }: Props) {
 
       const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 
-      window.open(url, "_blank");
+      window.location.href = url;
 
       clearCart();
       onClose();
@@ -155,64 +155,39 @@ export default function CartModal({ isOpen, onClose }: Props) {
 
         <div className="p-4 border-b flex justify-between items-center">
           <h2 className="text-xl font-bold">🛒 Tu carrito</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-black text-xl">
-            ✕
-          </button>
+          <button onClick={onClose}>✕</button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
 
-          {cart.length === 0 ? (
-            <p className="text-center text-gray-500">Carrito vacío</p>
-          ) : (
-            cart.map((item) => (
-              <div key={item.id} className="border rounded-lg p-3 flex flex-col gap-2">
+          {cart.map((item) => (
+            <div key={item.id} className="border rounded-lg p-3">
 
-                <div className="flex justify-between font-semibold">
-                  <span>{item.nombre}</span>
-                  <button onClick={() => removeFromCart(item.id)} className="text-red-500">
-                    ❌
-                  </button>
+              <div className="flex justify-between font-semibold">
+                <span>{item.nombre}</span>
+                <button onClick={() => removeFromCart(item.id)}>❌</button>
+              </div>
+
+              <div className="flex justify-between mt-2">
+
+                <div className="flex gap-2">
+                  <button onClick={() => updateQuantity(item.id, item.cantidad - 1)}>-</button>
+                  <span>{item.cantidad}</span>
+                  <button onClick={() => updateQuantity(item.id, item.cantidad + 1)}>+</button>
                 </div>
 
-                <div className="flex items-center justify-between">
-
-                  <div className="flex items-center gap-2">
-
-                    <button
-                      onClick={() => updateQuantity(item.id, item.cantidad - 1)}
-                      className="bg-gray-200 px-3 rounded"
-                    >
-                      -
-                    </button>
-
-                    <span>{item.cantidad}</span>
-
-                    <button
-                      onClick={() => updateQuantity(item.id, item.cantidad + 1)}
-                      className="bg-gray-200 px-3 rounded"
-                    >
-                      +
-                    </button>
-
-                  </div>
-
-                  <span className="font-bold">
-                    ${item.precio * item.cantidad}
-                  </span>
-
-                </div>
+                <span>${item.precio * item.cantidad}</span>
 
               </div>
-            ))
-          )}
+
+            </div>
+          ))}
 
         </div>
 
-        <div className="p-4 border-t space-y-3">
+        <div className="p-4 space-y-3">
 
           <input
-            type="text"
             placeholder="Nombre"
             className="w-full border p-2 rounded"
             value={name}
@@ -220,7 +195,6 @@ export default function CartModal({ isOpen, onClose }: Props) {
           />
 
           <input
-            type="text"
             placeholder="Dirección"
             className="w-full border p-2 rounded"
             value={address}
@@ -228,20 +202,19 @@ export default function CartModal({ isOpen, onClose }: Props) {
           />
 
           <input
-            type="text"
-            placeholder="Referencias de la casa (color, portón, árbol, etc)"
+            placeholder="Referencias"
             className="w-full border p-2 rounded"
             value={reference}
             onChange={(e) => setReference(e.target.value)}
           />
 
-          <p className="font-semibold text-center">
+          <p className="font-bold text-center">
             Subtotal: ${getTotal()}
           </p>
 
         </div>
 
-        <div className="p-4 border-t flex gap-2">
+        <div className="p-4 flex gap-2">
 
           <button
             onClick={onClose}
