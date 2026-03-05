@@ -1,8 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
-
-/* ===== Tipos ===== */
+import { createContext, useContext, useState, useEffect } from "react";
 
 export interface CartItem {
   id: number;
@@ -20,12 +18,21 @@ interface CartContextType {
   getTotal: () => number;
 }
 
-/* ================= */
-
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  const [cart, setCart] = useState<CartItem[]>([]);
+
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("cart");
+      return stored ? JSON.parse(stored) : [];
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (item: Omit<CartItem, "cantidad">) => {
     setCart((prev) => {
@@ -46,6 +53,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateQuantity = (id: number, cantidad: number) => {
+
     if (cantidad <= 0) {
       removeFromCart(id);
       return;
