@@ -11,26 +11,12 @@ export default function Home() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("Todos");
-
   const [busquedaWhats, setBusquedaWhats] = useState("");
 
+  const [productoAgregado, setProductoAgregado] = useState("");
+
   const telefonoFijo = "614-419-3049";
-  const whatsapp = "526143167360";
-
-  const preguntarWhatsApp = () => {
-
-    if (!busquedaWhats.trim()) {
-      alert("Escribe el producto que buscas");
-      return;
-    }
-
-    const mensaje = `Hola, estoy buscando este producto:\n\n${busquedaWhats}\n\n¿Lo tienen disponible?`;
-
-    const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(mensaje)}`;
-
-    window.open(url, "_blank");
-
-  };
+  const whatsapp = "5216143167360";
 
   const productosData = [
     { id:1,nombre:"Cemento Apasco 25kg",precio:140,categoria:"Cementos",imagen:"/productos/cemento-apasco.jpg"},
@@ -66,6 +52,21 @@ export default function Home() {
     p.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
+  const preguntarWhatsApp = () => {
+
+    if(!busquedaWhats.trim()){
+      alert("Escribe el producto que buscas");
+      return;
+    }
+
+    const mensaje = `Hola, estoy buscando este producto:\n\n${busquedaWhats}\n\n¿Lo tienen disponible?`;
+
+    const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(mensaje)}`;
+
+    window.open(url,"_blank");
+
+  };
+
   return (
 
 <main className="bg-black text-white min-h-screen">
@@ -75,6 +76,7 @@ export default function Home() {
 <div className="bg-gray-900 text-gray-300 text-center py-2 text-sm border-b border-gray-700">
 Tel: {telefonoFijo} | WhatsApp: 614-316-7360
 </div>
+
 
 {/* NAVBAR */}
 
@@ -108,6 +110,7 @@ Contacto
 
 </nav>
 
+
 {/* HERO */}
 
 <section className="text-center py-20 px-6 bg-gray-950">
@@ -124,6 +127,7 @@ Cotizar por WhatsApp
 </a>
 
 </section>
+
 
 {/* PRODUCTOS */}
 
@@ -149,6 +153,7 @@ onChange={(e)=>setCategoria(e.target.value)}
 </select>
 
 </div>
+
 
 <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
 
@@ -176,11 +181,21 @@ ${producto.precio}
 </p>
 
 <button
-onClick={()=>addToCart({
+onClick={()=>{
+
+addToCart({
 id:producto.id,
 nombre:producto.nombre,
 precio:producto.precio
-})}
+});
+
+setProductoAgregado(producto.nombre);
+
+setTimeout(()=>{
+setProductoAgregado("");
+},2000);
+
+}}
 className="w-full bg-white text-black py-2 rounded-lg font-semibold hover:bg-gray-300 transition"
 >
 ➕ Agregar al carrito
@@ -193,6 +208,7 @@ className="w-full bg-white text-black py-2 rounded-lg font-semibold hover:bg-gra
 ))}
 
 </div>
+
 
 {/* SECCIÓN ¿NO ENCUENTRAS LO QUE BUSCAS? */}
 
@@ -224,6 +240,7 @@ Preguntar por WhatsApp
 </div>
 
 </section>
+
 
 {/* CONTACTO */}
 
@@ -261,6 +278,16 @@ Chihuahua, Chihuahua
 isOpen={isCartOpen}
 onClose={()=>setIsCartOpen(false)}
 />
+
+{productoAgregado && (
+
+<div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg animate-bounce z-50">
+
+Producto agregado: {productoAgregado}
+
+</div>
+
+)}
 
 </main>
 
